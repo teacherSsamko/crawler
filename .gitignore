@@ -127,3 +127,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Private
+*.jpg
+*.jpeg
+*.gif
+*.txt
+*.csv
+*.tsv
+*.xls
+*.xlsx
+*.zip
+shopnt/detail/
