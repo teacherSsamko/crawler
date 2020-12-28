@@ -23,12 +23,13 @@ category = soup.select_one('#gnbAnalytics')
 
 # ctg1 = category.select()
 
-ctg1 = category.select('ul.shopping-menu-list')
-# print('ctg2-',end='')
-# print(category.select_one('li.fashion-sundries > a').text.strip())
-first_ctg2 = category.select('li.fashion-sundries')
+ctg1 = category.select('ul.shopping-menu-list > li')
+
+# print(len(ctg1))
 for c1 in ctg1:
-    ctg1_name = c1.select_one('li > a').text.strip()
+    # ctg1_name = c1.select_one('li > a').text.strip()
+    ctg1_name = c1.select_one('a > i.select-icon').previous_sibling.strip()
+    # print(ctg1_name)
     ctg2 = c1.select('li.second-depth-list')
     for c2 in ctg2:
         # print(ctg2_name)
