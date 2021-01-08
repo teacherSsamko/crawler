@@ -138,4 +138,6 @@ dmypy.json
 *.xls
 *.xlsx
 *.zip
+*.json
+*.html
 shopnt/detail/
