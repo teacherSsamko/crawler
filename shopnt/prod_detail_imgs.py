@@ -1,6 +1,7 @@
 import os
 import time
 import datetime
+import re
 
 import requests
 from bs4 import BeautifulSoup
@@ -18,7 +19,7 @@ col = db['shopnt_prod']
 
 today = datetime.date.today()
 
-prod_list = list(col.find({'reg_date':str(today)}))
+prod_list = list(col.find({'detail_imgs_url':{'$exists':False}, 'prod_name':{'$not':re.compile("페이지 없음")}}))
 
 options = Options()
 options.page_load_strategy = 'eager'
@@ -32,14 +33,15 @@ detail_img_api = 'http://www.shoppingntmall.com/display/goods/detail/describe/{p
 # with open(os.path.join(BASE_DIR,'prod_id_list08.txt'), 'r') as f:
 #     prods = f.readlines()
 #     total = len(prods)
+error_id = ''
 total = len(prod_list)
 current = 1
 for prod in prod_list:
     prod_id = prod['prod_id']
     url = url_prefix + prod_id
 
-    print(f'{current}/{total}')
-    print(url)
+    print(f'\r{current}/{total}', end='')
+    
     driver.get(url)
     time.sleep(1)
 
@@ -62,7 +64,7 @@ for prod in prod_list:
         for img in detail_imgs:
             detail_imgs_url.append(img.get_attribute('src'))
     except:
-        print(f'prod id: {prod_id} is not available now')
+        error_id += f'{prod_id}\n'
         current += 1
         continue
 
@@ -96,3 +98,7 @@ for prod in prod_list:
     #     break
 
 driver.quit()
+
+
+with open(os.path.join(BASE_DIR, 'cant_detail_ids.txt'), 'w') as f:
+    f.write(error_id)

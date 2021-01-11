@@ -3,6 +3,7 @@ import time
 import datetime
 import json
 import difflib
+import re
 
 import requests
 from bs4 import BeautifulSoup
@@ -20,7 +21,7 @@ col = db['shopnt_prod']
 
 today = datetime.date.today()
 
-prod_list = list(col.find({'reg_date':str(today)}))
+prod_list = list(col.find({'detail_imgs_url':{'$exists':False}, 'prod_name':{'$not':re.compile("페이지 없음")}}))
 
 # options = Options()
 # options.page_load_strategy = 'eager'
@@ -35,6 +36,7 @@ headers = {'Content-Type': 'application/json; charset=utf-8'}
 # with open(os.path.join(BASE_DIR,'prod_id_list08.txt'), 'r') as f:
 #     prods = f.readlines()
 #     total = len(prods)
+error_id = ''
 total = len(prod_list)
 current = 1
 for prod in prod_list:
@@ -43,7 +45,7 @@ for prod in prod_list:
     detail_img_api = 'http://www.shoppingntmall.com/display/goods/detail/describe/' + prod_id
     detail_img_api = detail_img_api.strip()
 
-    print(f'{current}/{total}')
+    print(f'\r{current}/{total}', end='')
     #goods_describe > div > div > p > img:nth-child(1)
 
     # try:
@@ -71,8 +73,8 @@ for prod in prod_list:
             detail_imgs_url.append(src)
 
     except Exception as e:
-        print(e)
-        print(f'prod id: {prod_id} is not available now')
+        # print(e)
+        error_id += f'{prod_id}\n'
         current += 1
         continue
     # print('\n'.join(detail_imgs_url))
@@ -106,3 +108,5 @@ for prod in prod_list:
     #     break
 
 
+with open(os.path.join(BASE_DIR, 'cant_detail_ids.txt'), 'w') as f:
+    f.write(error_id)
